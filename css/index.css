@@ -1,0 +1,19 @@
+body{
+  margin: 0;
+  padding: 0;
+}
+
+#canvas{
+  border: 1px solid black;
+}
+
+#repaintBtn{
+  margin: 10px 10px;
+  padding: 8px 16px;
+  background-color: rgb(50, 50, 233);
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
