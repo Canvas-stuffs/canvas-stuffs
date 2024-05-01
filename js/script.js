@@ -1,7 +1,6 @@
 import {
   getRandomColor,
   findSmallestAreaDiffValues,
-  toggleCursorStyle,
 } from "../helpers/utils.js";
 
 const canvas = document.getElementById("canvas");
@@ -9,8 +8,6 @@ const ctx = canvas.getContext("2d");
 
 canvas.width = canvas.clientWidth;
 canvas.height = canvas.clientHeight;
-
-const repaintBtn = document.getElementById("repaintBtn");
 
 class Rectangle {
   constructor(x, y, width, height, color, isPreview = false) {
@@ -88,8 +85,6 @@ canvas.addEventListener("mousedown", (e) => {
   const randomColor = getRandomColor();
 
   newRectangle = new Rectangle(null, null, null, null, randomColor, true);
-
-  toggleCursorStyle();
 });
 
 canvas.addEventListener("mousemove", (e) => {
@@ -111,7 +106,6 @@ canvas.addEventListener("mousemove", (e) => {
 
 canvas.addEventListener("mouseup", (e) => {
   e.preventDefault();
-  toggleCursorStyle();
   if (
     newRectangle.width !== null &&
     newRectangle.height !== null &&
@@ -135,9 +129,13 @@ canvas.addEventListener("mouseup", (e) => {
   data.isDrawing = false;
 });
 
-repaintBtn.addEventListener("click", (e) => {
+document.getElementById("paint-action").addEventListener("click", (e) => {
   e.preventDefault();
   repaint();
+});
+document.getElementById("clear-action").addEventListener("click", (e) => {
+  e.preventDefault();
+  rectangles = [];
 });
 
 canvas.addEventListener("dblclick", async (e) => {
