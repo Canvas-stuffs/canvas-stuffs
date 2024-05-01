@@ -13,18 +13,22 @@ canvas.height = canvas.clientHeight;
 const repaintBtn = document.getElementById("repaintBtn");
 
 class Rectangle {
-  constructor(x, y, width, height, color) {
+  constructor(x, y, width, height, color, isPreview = false) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.color = color;
     this.rotation = 0;
+    this.isPreview = isPreview;
   }
   draw(index) {
     ctx.save();
     ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
     ctx.rotate((this.rotation * Math.PI) / 180);
+    if (this.isPreview) {
+      ctx.globalAlpha = 0.5;
+    }
     ctx.fillStyle = this.color;
     ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
     ctx.fillStyle = "#000000";
@@ -81,10 +85,10 @@ canvas.addEventListener("mousedown", (e) => {
   data.start.y = e.clientY - rect.top;
   data.isDrawing = true;
 
-  newRectangle = new Rectangle(null, null, null, null, null);
-
   const randomColor = getRandomColor();
-  newRectangle.color = randomColor;
+
+  newRectangle = new Rectangle(null, null, null, null, randomColor, true);
+
   toggleCursorStyle();
 });
 
@@ -111,17 +115,17 @@ canvas.addEventListener("mouseup", (e) => {
   if (
     newRectangle.width !== null &&
     newRectangle.height !== null &&
-    newRectangle.width > 0 &&
-    newRectangle.height > 0
-  )
+    newRectangle.width !== 0 &&
+    newRectangle.height !== 0
+  ) {
+    newRectangle.isPreview = false;
     rectangles.push(newRectangle);
+  }
 
   rectangles.forEach((rectangle, index) => {
     rectangle.draw(index);
   });
 
-  console.log("===================");
-  console.log("ensemble des rectangles", rectangles);
   data.start.x = null;
   data.start.y = null;
   data.end.x = null;
@@ -180,9 +184,14 @@ function repaint() {
 function drawRectangles() {
   requestAnimationFrame(drawRectangles);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   rectangles.forEach((rectangle, index) => {
     rectangle.draw(index);
   });
+
+  if (data.isDrawing) {
+    newRectangle.draw("PREVIEW");
+  }
 }
 
 function rotateAndDeleteRectangle(rectangle, index) {
