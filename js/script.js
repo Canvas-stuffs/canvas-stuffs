@@ -6,28 +6,32 @@ import {
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-const repaintBtn = document.getElementById("repaintBtn");
+canvas.width = canvas.clientWidth;
+canvas.height = canvas.clientHeight;
 
 class Rectangle {
-  constructor(x, y, width, height, color) {
+  constructor(x, y, width, height, color, isPreview = false) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.color = color;
     this.rotation = 0;
+    this.isPreview = isPreview;
   }
-  draw() {
+  draw(index) {
     ctx.save();
     ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
     ctx.rotate((this.rotation * Math.PI) / 180);
+    if (this.isPreview) {
+      ctx.globalAlpha = 0.5;
+    }
     ctx.fillStyle = this.color;
     ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+    ctx.fillStyle = "#000000";
+    ctx.font = "50px Arial";
+    ctx.fillText(index.toString(), 0, 0);
     ctx.restore();
-    // ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
   rotateFn(angle) {
     this.rotation = angle;
@@ -69,6 +73,8 @@ let rectangles = [];
 let rectangleAreas = [];
 let newRectangle;
 
+let rectanglesToDelete = {};
+
 canvas.addEventListener("mousedown", (e) => {
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
@@ -76,10 +82,9 @@ canvas.addEventListener("mousedown", (e) => {
   data.start.y = e.clientY - rect.top;
   data.isDrawing = true;
 
-  newRectangle = new Rectangle(null, null, null, null, null);
-
   const randomColor = getRandomColor();
-  newRectangle.color = randomColor;
+
+  newRectangle = new Rectangle(null, null, null, null, randomColor, true);
 });
 
 canvas.addEventListener("mousemove", (e) => {
@@ -99,41 +104,22 @@ canvas.addEventListener("mousemove", (e) => {
   }
 });
 
-canvas.addEventListener("dblclick", async (e) => {
-  e.preventDefault();
-  const rect = canvas.getBoundingClientRect();
-  data.dblClickPos.x = e.clientX - rect.left;
-  data.dblClickPos.y = e.clientY - rect.top;
-
-  for (let index = rectangles.length - 1; index >= 0; index--) {
-    const rectangle = rectangles[index];
-    console.log("============== rectangle:", index);
-    const isRectangleDblClicked =
-      data.dblClickPos.x >= rectangle.x &&
-      data.dblClickPos.x <= rectangle.x + rectangle.width &&
-      data.dblClickPos.y >= rectangle.y &&
-      data.dblClickPos.y <= rectangle.y + rectangle.height;
-
-    if (isRectangleDblClicked) {
-      console.log("rectangle cllickeddd", rectangle.x, rectangle.y);
-
-      rotateAndDeleteRectangle(index);
-      break;
-    }
-  }
-});
-
 canvas.addEventListener("mouseup", (e) => {
   e.preventDefault();
-  if (newRectangle.x !== null && newRectangle.y !== null)
+  if (
+    newRectangle.width !== null &&
+    newRectangle.height !== null &&
+    newRectangle.width !== 0 &&
+    newRectangle.height !== 0
+  ) {
+    newRectangle.isPreview = false;
     rectangles.push(newRectangle);
+  }
 
-  rectangles.forEach((rectangle) => {
-    rectangle.draw();
+  rectangles.forEach((rectangle, index) => {
+    rectangle.draw(index);
   });
 
-  console.log("===================");
-  console.log("ensemble des rectangles", rectangles);
   data.start.x = null;
   data.start.y = null;
   data.end.x = null;
@@ -143,9 +129,37 @@ canvas.addEventListener("mouseup", (e) => {
   data.isDrawing = false;
 });
 
-repaintBtn.addEventListener("click", (e) => {
+document.getElementById("paint-action").addEventListener("click", (e) => {
   e.preventDefault();
   repaint();
+});
+document.getElementById("clear-action").addEventListener("click", (e) => {
+  e.preventDefault();
+  rectangles = [];
+});
+
+canvas.addEventListener("dblclick", async (e) => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  data.dblClickPos.x = e.clientX - rect.left;
+  data.dblClickPos.y = e.clientY - rect.top;
+
+  for (let index = rectangles.length - 1; index >= 0; index--) {
+    const rectangle = rectangles[index];
+    const isRectangleDblClicked =
+      data.dblClickPos.x >= rectangle.x &&
+      data.dblClickPos.x <= rectangle.x + rectangle.width &&
+      data.dblClickPos.y >= rectangle.y &&
+      data.dblClickPos.y <= rectangle.y + rectangle.height;
+
+    if (isRectangleDblClicked) {
+      console.log("rectangle cllickeddd", rectangle.x, rectangle.y);
+
+      rectanglesToDelete[index] = false;
+      rotateAndDeleteRectangle(rectangle, index);
+      break;
+    }
+  }
 });
 
 function repaint() {
@@ -166,20 +180,43 @@ function repaint() {
 }
 
 function drawRectangles() {
-  console.log("SAY HELLO");
   requestAnimationFrame(drawRectangles);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  rectangles.forEach((rectangle) => {
-    rectangle.draw();
+
+  rectangles.forEach((rectangle, index) => {
+    rectangle.draw(index);
   });
+
+  if (data.isDrawing) {
+    newRectangle.draw("PREVIEW");
+  }
 }
 
-function rotateAndDeleteRectangle(index) {
-  rectangles[index].rotateFn(45);
+function rotateAndDeleteRectangle(rectangle, index) {
+  const interval = setInterval(() => {
+    if (rectangle.rotation < 360) {
+      rectangle.rotateFn(rectangle.rotation + 10);
+      rectanglesToDelete[index] = false;
+    } else {
+      clearInterval(interval);
+      rectanglesToDelete[index] = true;
 
-  setTimeout(() => {
-    rectangles.splice(index, 1);
-  }, 500);
+      const rectangleToDelIndexes = Object.keys(rectanglesToDelete).map((key) =>
+        parseInt(key)
+      );
+
+      const isAllAnimationCompleted = rectangleToDelIndexes.every(
+        (key) => rectanglesToDelete[key] === true
+      );
+
+      if (isAllAnimationCompleted) {
+        rectangles = rectangles.filter(
+          (el, inx) => !rectangleToDelIndexes.includes(inx)
+        );
+        rectanglesToDelete = {};
+      }
+    }
+  }, 100);
 }
 
 drawRectangles();

@@ -10,10 +10,24 @@
 
 <body>
 
-  <h1>Amusez vous avec canvas</h1>
-  <button id="repaintBtn">Repeindre</button>
+  <section id="toolbar">
+    <h3>Amusez vous avec canvas</h3>
+    <div id="menu">
+      <button class="action-btn" id="paint-action">
+        <img src="/assets/icons/paint.png" alt="">
+        <span>Repeindre</span>
+      </button>
+      <span class="separator"></span>
+      <button class="action-btn" id="clear-action">
+        <img src="/assets/icons/clear.png" alt="">
+        <span>Nettoyer</span>
+      </button>
+    </div>
+  </section>
 
-  <canvas id="canvas"></canvas>
+  <div id="canvas-container">
+    <canvas id="canvas"></canvas>
+  </div>
 
 
   <script type="module" src="js/script.js"></script>
