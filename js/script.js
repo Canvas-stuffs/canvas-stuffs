@@ -27,43 +27,10 @@ class Rectangle {
     ctx.fillStyle = this.color;
     ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
     ctx.restore();
-  }
-  delete() {
-    ctx.clearRect(this.x, this.y, this.width, this.height);
-
-    return new Promise(() => {
-      setTimeout(() => {
-        // ctx.save();
-
-        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-
-        ctx.rotate((this.rotation * Math.PI) / 180);
-        ctx.fillStyle = this.color;
-        // ctx.fillRect(0, 0, this.width, this.height);
-        ctx.fillRect(
-          -this.width / 2,
-          -this.height / 2,
-          this.width,
-          this.height
-        );
-
-        // ctx.restore();
-        ctx.clearRect(
-          -this.width / 2 - 2,
-          -this.height / 2 - 2,
-          this.width + 3,
-          this.height + 3
-        );
-      }, 1000);
-    });
-
-    // ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // rectangles.splice(idx, 1);
+    // ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
   rotateFn(angle) {
     this.rotation = angle;
-    this.draw();
   }
   calculArea() {
     return this.width * this.height;
@@ -132,13 +99,15 @@ canvas.addEventListener("mousemove", (e) => {
   }
 });
 
-canvas.addEventListener("dblclick", (e) => {
+canvas.addEventListener("dblclick", async (e) => {
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
   data.dblClickPos.x = e.clientX - rect.left;
   data.dblClickPos.y = e.clientY - rect.top;
 
-  for (const rectangle of rectangles) {
+  for (let index = rectangles.length - 1; index >= 0; index--) {
+    const rectangle = rectangles[index];
+    console.log("============== rectangle:", index);
     const isRectangleDblClicked =
       data.dblClickPos.x >= rectangle.x &&
       data.dblClickPos.x <= rectangle.x + rectangle.width &&
@@ -148,10 +117,8 @@ canvas.addEventListener("dblclick", (e) => {
     if (isRectangleDblClicked) {
       console.log("rectangle cllickeddd", rectangle.x, rectangle.y);
 
-      rectangle.delete();
-      rectangle.rotateFn(45);
-
-      console.log("AFTER OPERATIONS", rectangles);
+      rotateAndDeleteRectangle(index);
+      break;
     }
   }
 });
@@ -182,11 +149,37 @@ repaintBtn.addEventListener("click", (e) => {
 });
 
 function repaint() {
-  rectangleAreas = rectangles.map((el) => el.calculArea());
-  let [minIdx1, minIdx2] = findSmallestAreaDiffValues(rectangleAreas);
+  if (rectangles.length > 1) {
+    rectangleAreas = rectangles.map((el) => el.calculArea());
+    let [firstMinDiffAreaIdx, secondMinDiffAreaIdx] =
+      findSmallestAreaDiffValues(rectangleAreas);
 
-  let randomColor = getRandomColor();
+    let randomColor = getRandomColor();
 
-  rectangles[minIdx1].paint(randomColor);
-  rectangles[minIdx2].paint(randomColor);
+    rectangles[firstMinDiffAreaIdx].paint(randomColor);
+    rectangles[secondMinDiffAreaIdx].paint(randomColor);
+  } else {
+    alert(
+      "Il faut au minimum 2 rectangles pour effectuer cette opération. Créez en un autre!"
+    );
+  }
 }
+
+function drawRectangles() {
+  console.log("SAY HELLO");
+  requestAnimationFrame(drawRectangles);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  rectangles.forEach((rectangle) => {
+    rectangle.draw();
+  });
+}
+
+function rotateAndDeleteRectangle(index) {
+  rectangles[index].rotateFn(45);
+
+  setTimeout(() => {
+    rectangles.splice(index, 1);
+  }, 500);
+}
+
+drawRectangles();
