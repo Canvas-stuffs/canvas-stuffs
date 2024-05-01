@@ -30,4 +30,8 @@ function findSmallestAreaDiffValues(arr) {
   }
 }
 
-export { getRandomColor, findSmallestAreaDiffValues };
+function toggleCursorStyle() {
+  document.getElementById("canvas").toggleAttribute("is-drawing");
+}
+
+export { getRandomColor, findSmallestAreaDiffValues, toggleCursorStyle };
