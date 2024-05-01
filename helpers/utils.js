@@ -9,30 +9,25 @@ function getRandomColor() {
 
 function findSmallestAreaDiffValues(arr) {
   let n = arr.length;
-  let arrCopy = [...arr];
-  let sortedArray = arrCopy.sort((a, b) => a - b);
-  console.log("sorted array: ", sortedArray);
-  console.log("simple array: ", arr);
+  let sortedArray = [...arr].sort((a, b) => a - b);
+
   let minDiff = Number.MAX_VALUE;
-  let minsValue = [];
+  let minDiffAreaIdxs = [];
 
   for (let i = 0; i < n - 1; i++) {
-    let diff = Math.abs(sortedArray[i + 1] - sortedArray[i]);
-    if (diff < minDiff) {
-      minDiff = diff;
+    let currentDiff = Math.abs(sortedArray[i + 1] - sortedArray[i]);
+    if (currentDiff < minDiff) {
+      minDiff = currentDiff;
 
-      const min1 = arr.findIndex((el) => el == sortedArray[i]);
-      const min2 = arr.findIndex((el) => el == sortedArray[i + 1]);
+      const firstMinDiffAreaIdx = arr.findIndex((el) => el == sortedArray[i]);
+      const secondMinDiffAreaIdx = arr.findIndex(
+        (el) => el == sortedArray[i + 1]
+      );
 
-      // console.log("sorted array i: ", sortedArray[i]);
-      // console.log("sorted array i+1: ", sortedArray[i + 1]);
-      // console.log("simple array in if: ", arr);
-
-      console.log("min1 and min2: ", min1, "===", min2);
-
-      minsValue = [min1, min2];
+      minDiffAreaIdxs = [firstMinDiffAreaIdx, secondMinDiffAreaIdx];
     }
-    return minsValue;
+    return minDiffAreaIdxs;
   }
 }
+
 export { getRandomColor, findSmallestAreaDiffValues };

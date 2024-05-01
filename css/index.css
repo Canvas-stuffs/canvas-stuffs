@@ -4,11 +4,15 @@ body{
 }
 
 #canvas{
-  border: 1px solid black;
+  border: 4px solid blue;
+  /* margin: 20px ;
+  width: -webkit-fill-available; */
+  /* height: 80vh; */
 }
 
 #repaintBtn{
-  margin: 10px 10px;
+  display: block;
+    margin: 4px auto;
   padding: 8px 16px;
   background-color: rgb(50, 50, 233);
   color: white;
@@ -16,4 +20,8 @@ body{
   border-radius: 4px;
   border: none;
   cursor: pointer;
+}
+
+h1{
+text-align: center;
 }
