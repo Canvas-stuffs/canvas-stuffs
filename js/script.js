@@ -32,7 +32,7 @@ class Rectangle {
     ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
     ctx.fillStyle = "#000000";
     ctx.font = "20px Arial";
-    ctx.fillText(`${index}`, 0, 0);
+    ctx.fillText(`${index}`, -5, 5);
     ctx.restore();
   }
   rotateFn(angle) {
