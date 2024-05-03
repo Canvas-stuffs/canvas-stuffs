@@ -4,47 +4,42 @@ body {
   margin: 0;
   padding: 0;
   font-family: "Roboto", sans-serif;
-  font-weight: 400;
-  font-style: normal;
 }
 
-#toolbar {
+header {
   height: 50px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-}
-
-#menu {
-  display: flex;
-  justify-content: flex-end;
+  margin: 6px 0;
 }
 
 #canvas-container {
   display: flex;
   justify-content: center;
-  padding: 0 20px;
+  padding: 0 10px;
 }
 
+
 #canvas {
-  border: 1px solid rgba(0, 0, 0, 0.228);
   width: 98%;
-  height: calc(100vh - 70px);
-  border-radius: 10px;
-  -webkit-box-shadow: 0px 10px 37px -11px rgba(0, 0, 0, 0.75);
-  -moz-box-shadow: 0px 10px 37px -11px rgba(0, 0, 0, 0.75);
-  box-shadow: 0px 10px 37px -11px rgba(0, 0, 0, 0.75);
+  height: calc(100vh - 80px);
+  border-radius: 12px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
 
 #canvas[is-drawing] {
   cursor: crosshair;
 }
 
+
+#actions {
+  display: flex;
+}
+
 .action-btn {
-  background-color: transparent;
-  border: none;
   margin: 10px;
   padding: 8px;
   transition: all 0.2s ease-in;
@@ -59,23 +54,12 @@ body {
   margin-left: 10px;
 }
 
-.separator {
-  height: 55px;
-  width: 1px;
-}
-
 .action-btn:hover {
   cursor: pointer;
-  border: 1px solid rgba(0, 0, 0, 0.228);
-  -webkit-box-shadow: 6px 7px 37px -11px rgba(0, 0, 0, 0.75);
-  -moz-box-shadow: 6px 7px 37px -11px rgba(0, 0, 0, 0.75);
-  box-shadow: 6px 7px 37px -11px rgba(0, 0, 0, 0.75);
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  font-weight: bold;
 }
 
 .action-btn > img {
-  width: 30px;
-}
-
-h1 {
-  text-align: center;
+  width: 20px;
 }
