@@ -1,6 +1,8 @@
 import {
   getRandomColor,
   findSmallestAreaDiffValues,
+  toggleCursorStyle,
+  removeCursorStyle,
 } from "../helpers/utils.js";
 
 const canvas = document.getElementById("canvas");
@@ -29,8 +31,8 @@ class Rectangle {
     ctx.fillStyle = this.color;
     ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
     ctx.fillStyle = "#000000";
-    ctx.font = "50px Arial";
-    ctx.fillText(index.toString(), 0, 0);
+    ctx.font = "20px Arial";
+    ctx.fillText(`${index}`, 0, 0);
     ctx.restore();
   }
   rotateFn(angle) {
@@ -72,19 +74,22 @@ const data = {
 let rectangles = [];
 let rectangleAreas = [];
 let newRectangle;
-
 let rectanglesToDelete = {};
 
+
 canvas.addEventListener("mousedown", (e) => {
+  toggleCursorStyle();
+
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
   data.start.x = e.clientX - rect.left;
   data.start.y = e.clientY - rect.top;
+
   data.isDrawing = true;
 
   const randomColor = getRandomColor();
 
-  newRectangle = new Rectangle(null, null, null, null, randomColor, true);
+  newRectangle = new Rectangle(null, null, 0, 0, randomColor, true);
 });
 
 canvas.addEventListener("mousemove", (e) => {
@@ -105,40 +110,33 @@ canvas.addEventListener("mousemove", (e) => {
 });
 
 canvas.addEventListener("mouseup", (e) => {
+  removeCursorStyle();
   e.preventDefault();
-  if (
-    newRectangle.width !== null &&
-    newRectangle.height !== null &&
+  newRectangle.isPreview = false;
+
+  const isNewRectangle =
+    newRectangle.x !== null &&
+    newRectangle.y !== null &&
     newRectangle.width !== 0 &&
-    newRectangle.height !== 0
-  ) {
-    newRectangle.isPreview = false;
+    newRectangle.height !== 0;
+
+  if (isNewRectangle) {
     rectangles.push(newRectangle);
   }
 
-  rectangles.forEach((rectangle, index) => {
-    rectangle.draw(index);
-  });
+  newRectangle.draw("new");
 
   data.start.x = null;
   data.start.y = null;
   data.end.x = null;
   data.end.y = null;
-  data.end.width = null;
-  data.end.height = null;
+  data.end.width = 0;
+  data.end.height = 0;
   data.isDrawing = false;
 });
 
-document.getElementById("paint-action").addEventListener("click", (e) => {
-  e.preventDefault();
-  repaint();
-});
-document.getElementById("clear-action").addEventListener("click", (e) => {
-  e.preventDefault();
-  rectangles = [];
-});
-
 canvas.addEventListener("dblclick", async (e) => {
+  removeCursorStyle();
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
   data.dblClickPos.x = e.clientX - rect.left;
@@ -153,13 +151,20 @@ canvas.addEventListener("dblclick", async (e) => {
       data.dblClickPos.y <= rectangle.y + rectangle.height;
 
     if (isRectangleDblClicked) {
-      console.log("rectangle cllickeddd", rectangle.x, rectangle.y);
-
-      rectanglesToDelete[index] = false;
       rotateAndDeleteRectangle(rectangle, index);
       break;
     }
   }
+});
+
+document.getElementById("paint").addEventListener("click", (e) => {
+  e.preventDefault();
+  repaint();
+});
+
+document.getElementById("clear").addEventListener("click", (e) => {
+  e.preventDefault();
+  rectangles = [];
 });
 
 function repaint() {
@@ -188,7 +193,7 @@ function drawRectangles() {
   });
 
   if (data.isDrawing) {
-    newRectangle.draw("PREVIEW");
+    newRectangle.draw("");
   }
 }
 
@@ -201,17 +206,17 @@ function rotateAndDeleteRectangle(rectangle, index) {
       clearInterval(interval);
       rectanglesToDelete[index] = true;
 
-      const rectangleToDelIndexes = Object.keys(rectanglesToDelete).map((key) =>
-        parseInt(key)
+      const rectangleToDelIndexes = Object.keys(rectanglesToDelete).map(
+        (key) => +key
       );
 
-      const isAllAnimationCompleted = rectangleToDelIndexes.every(
+      const isAllRotationCompleted = rectangleToDelIndexes.every(
         (key) => rectanglesToDelete[key] === true
       );
 
-      if (isAllAnimationCompleted) {
+      if (isAllRotationCompleted) {
         rectangles = rectangles.filter(
-          (el, inx) => !rectangleToDelIndexes.includes(inx)
+          (el, idx) => !rectangleToDelIndexes.includes(idx)
         );
         rectanglesToDelete = {};
       }

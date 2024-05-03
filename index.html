@@ -10,25 +10,25 @@
 
 <body>
 
-  <section id="toolbar">
+  <header>
     <h3>Amusez vous avec canvas</h3>
-    <div id="menu">
-      <button class="action-btn" id="paint-action">
-        <img src="/assets/icons/paint.png" alt="">
+    <div id="actions">
+      <button class="action-btn" id="paint">
+        <img src="/assets/icons/paint.png" alt="Paint">
         <span>Repeindre</span>
       </button>
-      <span class="separator"></span>
-      <button class="action-btn" id="clear-action">
-        <img src="/assets/icons/clear.png" alt="">
+      <button class="action-btn" id="clear">
+        <img src="/assets/icons/clear.png" alt="Nettoyer">
         <span>Nettoyer</span>
       </button>
     </div>
-  </section>
+  </header>
 
-  <div id="canvas-container">
-    <canvas id="canvas"></canvas>
-  </div>
-
+  <main>
+    <section id="canvas-container">
+      <canvas id="canvas"></canvas>
+    </section>
+  </main>
 
   <script type="module" src="js/script.js"></script>
 

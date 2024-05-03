@@ -34,4 +34,13 @@ function toggleCursorStyle() {
   document.getElementById("canvas").toggleAttribute("is-drawing");
 }
 
-export { getRandomColor, findSmallestAreaDiffValues, toggleCursorStyle };
+function removeCursorStyle() {
+  document.getElementById("canvas").removeAttribute("is-drawing");
+}
+
+export {
+  getRandomColor,
+  findSmallestAreaDiffValues,
+  toggleCursorStyle,
+  removeCursorStyle,
+};
