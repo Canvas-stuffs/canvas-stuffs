@@ -169,7 +169,7 @@ document.getElementById("clear").addEventListener("click", (e) => {
 
 function repaint() {
   if (rectangles.length > 1) {
-    rectangleAreas = rectangles.map((el) => el.calculArea());
+    rectangleAreas = rectangles.map((rectangle) => rectangle.calculArea());
     let [firstMinDiffAreaIdx, secondMinDiffAreaIdx] =
       findSmallestAreaDiffValues(rectangleAreas);
 
